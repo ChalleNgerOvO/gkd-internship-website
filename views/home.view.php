@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-        <a href="listings.html" class="block text-xl text-center">
+        <a href="/listings" class="block text-xl text-center">
             <i class="fa fa-arrow-alt-circle-right"></i>
             查看所有实习
         </a>
