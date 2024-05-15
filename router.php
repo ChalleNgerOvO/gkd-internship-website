@@ -42,7 +42,13 @@ class Router
             }
         }
 
-        http_response_code(404);
-        loadView('error/404');
+        $this->error();  // 默认传递404
+    }
+
+    public function error($httpCode = 404)
+    {
+        http_response_code($httpCode);
+        loadView("error/{$httpCode}");
+        exit;
     }
 }
