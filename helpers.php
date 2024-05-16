@@ -2,67 +2,46 @@
 
 /**
  * 获取根路径
- * 
- * @param string $path
- * @return string
+ *
+ * @param string $path 可选参数，用于追加到基础路径之后的额外路径字符串
+ * @return string 返回拼接好的完整路径
  */
-function basePath($path = '')
-{
-    return __DIR__ . '/' . $path;
+function basePath($path = '') {
+    return __DIR__ . '/' . $path; // 将当前目录与传入的路径参数合并，然后返回结果
 }
 
-/**
- * 加载部分视图
- * 
- * @param string $name
- * @returen void
- */
-function loadPartial($name)
-{
+
+function loadPartial($name){
+
     $partialPath = basePath("views/partials/{$name}.php");
-    if (file_exists($partialPath)) {
+    if(file_exists($partialPath)){
         require $partialPath;
-    } else {
-        echo "{$name}部分视图不存在！";
+    }else{
+        echo "{$name}部分视图不存在";
     }
 }
 
-/**
- * 加载视图
- * 
- * @param string $name
- * @returen void
- *  */
-function loadView($name)
-{
+
+function loadView($name,$data=[]){
     $viewPath = basePath("views/{$name}.view.php");
-    if (file_exists($viewPath)) {
+    if(file_exists($viewPath)){
+        extract($data);
         require $viewPath;
-    } else {
-        echo "{$path}视图文件不存在！";
+    }else{
+        echo "{$path}视图不存在";
     }
 }
 
-/**
- * 检查某个值
- * 
- * @param mixed $value
- * @return void
- */
-function inspect($value)
-{
-    echo "<pre>";
+
+
+function inspect($value){
+    echo '<pre>';
     var_dump($value);
-    echo "</pre>";
+    echo '<pre>';
 }
 
-/**
- * @param mixed $name
- * @return void
- */
-function inspectAndDie($value)
-{
-    echo "<pre>";
+function inspectAndDie($value){
+    echo '<pre>';
     die(var_dump($value));
-    echo "</pre>";
+    echo '<pre>';
 }
