@@ -1,0 +1,16 @@
+{
+    "name": "ovo/gkd-internship-website",
+    "description": "a stupid website",
+    "authors": [
+        {
+            "name": "为chan",
+            "email": "1421724522@qq.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Framework\\": "Framework/",
+            "App\\": "App/"
+        }
+    }
+}
