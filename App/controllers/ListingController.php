@@ -17,10 +17,10 @@ class ListingController
 
     public function index()
     {
-        $Listings = $this->db->query('SELECT * FROM listing')->fetchAll();
+        $listings = $this->db->query('SELECT * FROM listing')->fetchAll();
 
         loadView('listings/index', [
-            'listings' => $Listings
+            'listings' => $listings
         ]);
     }
 
@@ -47,6 +47,7 @@ class ListingController
             'listing' => $listing
         ]);
     }
+
     public function store()
     {
         $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'address', 'city', 'province', 'phone', 'email', 'requirements', 'benefits'];
@@ -65,35 +66,25 @@ class ListingController
         $errors = [];
         foreach ($requiredFields as $field) {
             if (empty($newListingData[$field]) || !Validation::string($newListingData[$field])) {
-                $errors[$field] = ucfirst($field) . ' is required.';
+                $errors[$field] = ucfirst($field) . ' 为必须项';
             }
         }
-
 
         if (!empty($errors)) {
             loadView('listings/create', [
                 'errors' => $errors,
                 'listing' => $newListingData
             ]);
+            return; // 添加 return 以确保在有错误时不继续执行
         } else {
-            $fields = [];
-            foreach ($newListingData as $field => $value) {
-                $fields[] = $field;
-            }
-            $fields = implode(', ', $fields);
-            $values = [];
-            foreach ($newListingData as $field => $value) {
-                if ($value === '') {
-                    $newListingData[$field] = null;
-                }
-                $values[] = ':' . $field;
-            }
-            $values = implode(', ', $values);
+            $fields = implode(', ', array_keys($newListingData));
+            $values = ':' . implode(', :', array_keys($newListingData));
             $query = "INSERT INTO listing ({$fields}) VALUES ({$values})";
             $this->db->query($query, $newListingData);
             redirect('/listings');
         }
     }
+
     public function destroy($params)
     {
         $id = $params['id'];
@@ -109,6 +100,7 @@ class ListingController
         $_SESSION['success_message'] = '删除职位成功';
         redirect('/listings');
     }
+
     public function edit($params)
     {
         $id = $params['id'] ?? '';
@@ -124,6 +116,7 @@ class ListingController
             'listing' => $listing
         ]);
     }
+
     public function update($params)
     {
         $id = $params['id'] ?? '';
@@ -135,11 +128,11 @@ class ListingController
             ErrorController::notFound("职位不存在");
             return;
         }
-        $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'address', 'city', 'state', 'phone', 'email', 'requirements', 'benefits'];
+        $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'address', 'city', 'province', 'phone', 'email', 'requirements', 'benefits'];
         $updateValues = array_intersect_key($_POST, array_flip($allowedFields));
         $updateValues = array_map('sanitize', $updateValues);
         $requiredFields = ['title', 'description', 'salary', 'email', 'city', 'province'];
-        $error = [];
+        $errors = [];
         foreach ($requiredFields as $field) {
             if (empty($updateValues[$field]) || !Validation::string($updateValues[$field])) {
                 $errors[$field] = ucfirst($field) . ' 为必须项';
@@ -151,17 +144,17 @@ class ListingController
                 'errors' => $errors,
                 'listing' => $updateValues
             ]);
-            exit;
+            return; // 添加 return 以确保在有错误时不继续执行
         } else {
             $updateFields = [];
             foreach (array_keys($updateValues) as $field) {
-                $updateFields[] = "{field} = :{$field}";
+                $updateFields[] = "{$field} = :{$field}";
             }
             $updateFields = implode(', ', $updateFields);
-            $updateQuery = "UPDATE listing SET {$updateFields} WHERE id = :id";
+            $updateQuery = "UPDATE listing SET $updateFields WHERE id = :id";
             $updateValues['id'] = $id;
             $this->db->query($updateQuery, $updateValues);
-            $_SESSION['success_message'] = "职位信息以更新";
+            $_SESSION['success_message'] = "职位信息已更新";
             redirect('/listings/' . $id);
         }
     }

@@ -16,23 +16,23 @@
                 <?php endforeach; ?>
             <?php endif; ?>
             <div class="mb-4">
-                <input type="text" name="title" placeholder="职位标题" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing['title'] ?? '' ?>" />
+                <input type="text" name="title" placeholder="职位标题" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing->title ?? '' ?>" />
             </div>
             <div class="mb-4">
-                <textarea name="description" placeholder="职位描述" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing['description'] ?? '' ?>"></textarea>
+                <textarea name="description" placeholder="职位描述" class="w-full px-4 py-2 border rounded focus:outline-none"><?= $listing->description ?? '' ?></textarea>
             </div>
             <div class="mb-4">
-                <input type="text" name="salary" placeholder="年薪" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing['salary'] ?? '' ?>" />
+                <input type="text" name="salary" placeholder="年薪" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing->salary ?? '' ?>" />
             </div>
             <div class="mb-4">
-                <input type="text" name="requirements" placeholder="要求" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing['requirements'] ?? '' ?>" />
+                <input type="text" name="requirements" placeholder="要求" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing->requirements ?? '' ?>" />
             </div>
             <div class="mb-4">
-                <input type="text" name="benefits" placeholder="福利" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing['benefits'] ?? '' ?>" />
+                <input type="text" name="benefits" placeholder="福利" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing->benefits ?? '' ?>" />
             </div>
 
             <div class="mb-4">
-                <input type="text" name="tag" placeholder="标签" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing['tags'] ?? '' ?>" />
+                <input type="text" name="tag" placeholder="标签" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $listing->tags ?? '' ?>" />
             </div>
 
             <h2 class="text-2xl font-bold mb-6 text-center text-gray-500">
