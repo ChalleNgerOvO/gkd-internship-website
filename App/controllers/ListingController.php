@@ -87,8 +87,66 @@ class ListingController
                 'Listing' => $newListingData
             ]);
         } else {
-            // 否则输出成功消息
-            echo "表单提交成功！";
+            // 没有错误信息，验证通过，准备SQL数据
+            $fields = [];
+            $values = [];
+
+            // 遍历新职位数据，将字段和对应的值分别存储在数组中
+            foreach ($newListingData as $field => $value) {
+                // 检查是否为空字段
+                if (!empty($value)) {
+                    $fields[] = $field;
+                    $values[] = $value;
+                }
+            }
+
+            // 将字段和值分别连接为字符串，以便SQL插入语句使用
+            $fields = implode(', ', $fields);
+            $values = implode(', ', array_map([$this->db, 'quote'], $values));
+
+            // 构建SQL插入语句
+            $query = "INSERT INTO listing ({$fields}) VALUES ({$values})";
+
+            // 执行SQL插入语句
+            $this->db->query($query, $newListingData);
+
+            // 重定向到列表页
+            redirect('/listings');
         }
+    }
+
+    /**
+     * 删除一个列表项
+     *
+     * 该方法首先会检查数据库中是否有该项 ID，然后，如果该 ID 在数据库中，则会将该项删除。
+     * 如果该项不存在，则返回一个错误消息。删除操作完成后，返回到列表页。
+     *
+     * @param array $params 包含各个参数的数组，例如项的ID.
+     * @return void 该方法没有返回值.
+     */
+    public function destroy($params)
+    {
+        // 从参数中获取列表项的ID
+        $id = $params['id'] ?? '';
+
+        // 准备用于数据库查询的参数数组
+        $params = [
+            'id' => $id
+        ];
+
+        // 查询数据库以确认该项是否存在
+        $listing = $this->db->query('SELECT * FROM listing WHERE id = :id', $params)->fetch();
+
+        // 如果该项不存在，则显示错误
+        if (!$listing) {
+            ErrorController::notFound('该项不存在！');
+            return;
+        }
+
+        // 执行删除操作
+        $this->db->query('DELETE FROM listing WHERE id = :id', $params);
+
+        // 删除成功后重定向到列表页面
+        redirect('/listings');
     }
 }

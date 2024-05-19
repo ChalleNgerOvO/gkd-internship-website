@@ -5,5 +5,6 @@ $router->addGet('/', 'HomeController@index');
 // $router->addGet('/listing', 'controllers/listings/show.php');
 $router->addGet('/listings', 'ListingController@index');
 $router->addGet('/listings/create', 'ListingController@create');
-$router->addGet('/listing/{id}', 'ListingController@show');
+$router->addGet('/listings/{id}', 'ListingController@show');
 $router->addPost('/listings', 'ListingController@store');
+$router->addDelete('/listings/{id}', 'ListingController@destroy');
