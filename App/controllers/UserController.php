@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use Framework\Database;
 use Framework\Validation;
+use Framework\Session;
 
 class UserController
 {
@@ -91,7 +92,50 @@ class UserController
             ]);
             exit;
         } else {
-            inspectAndDie('用户已注册');
+            // 检查电子邮件是否已存在
+            $params = [
+                'email' => $email // 使用电子邮件作为查询的参数
+            ];
+
+            // 执行查询，查看是否有相同的电子邮件已存在于数据库中
+            $user = $this->db->query('SELECT * FROM users WHERE email = :email', $params)->fetch();
+
+            // 如果查询到用户（即电子邮件已被注册）
+            if ($user) {
+                $errors['email'] = '该邮箱已注册！'; // 添加错误信息
+                // 重新加载注册页面并显示错误信息
+                loadView('users/create', [
+                    'errors' => $errors
+                ]);
+                // 终止进一步执行
+                exit;
+            }
+
+            // 创建用户账户
+            $params = [
+                'name' => $name, // 用户名
+                'email' => $email, // 电子邮件
+                'city' => $city, // 城市
+                'province' => $province, // 省
+                'password' => password_hash($password, PASSWORD_DEFAULT) // 对密码进行哈希处理
+            ];
+
+            // 执行 SQL 插入操作，将新用户数据插入数据库
+            $this->db->query('INSERT INTO users (name, email, city, province, password) VALUES (:name, :email, :city, :province, :password)', $params);
+
+            //Get new user id
+            $userId = $this->db->conn->lastInsertId();
+
+            Session::set('user', [
+                'id' => $userId,
+                'name' => $name,
+                'email' => $email,
+                'city' => $city,
+                'province' => $province
+            ]);
+
+            // 创建用户成功后重定向到首页
+            redirect('/');
         }
     }
 }

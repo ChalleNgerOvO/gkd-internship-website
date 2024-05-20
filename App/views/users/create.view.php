@@ -10,16 +10,16 @@
         ]) ?>
         <form method="POST" action="/auth/register">
             <div class="mb-4">
-                <input type="text" name="name" placeholder="全名" class="w-full px-4 py-2 border rounded focus:outline-none" />
+                <input type="text" name="name" placeholder="全名" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $user['name'] ?? '' ?>" />
             </div>
             <div class="mb-4">
-                <input type="email" name="email" placeholder="电子邮箱地址" class="w-full px-4 py-2 border rounded focus:outline-none" />
+                <input type="email" name="email" placeholder="电子邮箱地址" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $user['email'] ?? '' ?>" />
             </div>
             <div class="mb-4">
-                <input type="text" name="city" placeholder="城市" class="w-full px-4 py-2 border rounded focus:outline-none" />
+                <input type="text" name="city" placeholder="城市" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $user['city'] ?? '' ?>" />
             </div>
             <div class="mb-4">
-                <input type="text" name="province" placeholder="省份" class="w-full px-4 py-2 border rounded focus:outline-none" />
+                <input type="text" name="province" placeholder="省份" class="w-full px-4 py-2 border rounded focus:outline-none" value="<?= $user['province'] ?? '' ?>" />
             </div>
             <div class="mb-4">
                 <input type="password" name="password" placeholder="密码" class="w-full px-4 py-2 border rounded focus:outline-none" />
