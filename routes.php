@@ -10,3 +10,5 @@ $router->addGet('/listings/edit/{id}', 'ListingController@edit');
 $router->addPost('/listings', 'ListingController@store');
 $router->addPut('/listings/{id}', 'ListingController@update');
 $router->addDelete('/listings/{id}', 'ListingController@destroy');
+$router->addGet('/auth/register', 'UserController@create');
+$router->addGet('/auth/login', 'UserController@login');
