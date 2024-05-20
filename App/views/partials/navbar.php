@@ -12,7 +12,7 @@ use Framework\Session;
     <nav class="space-x-4">
       <?php if (Session::has('user')) : ?>
         <div class="flex justify-between items-center gap-4">
-          <div>
+          <div class="text-blue-500">
             欢迎, <?= Session::get('user')['name'] ?>
           </div>
           <form method="POST" action="/auth/logout">

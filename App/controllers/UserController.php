@@ -138,4 +138,22 @@ class UserController
             redirect('/');
         }
     }
+    /**
+     * 注销用户并结束会话
+     *
+     * @return void 无返回值
+     */
+    public function logout()
+    {
+        // 调用 Session 类的 clearAll 方法来清空所有会话数据
+        Session::clearAll();
+
+        // 获取会话 cookie 的参数
+        $params = session_get_cookie_params();
+        // 删除会话 cookie，设置过期时间为当前时间之前一天，确保浏览器删除该 cookie
+        setcookie('PHPSESSID', '', time() - 86400, $params['path'], $params['domain']);
+
+        // 重定向到网站首页
+        redirect('/');
+    }
 }
