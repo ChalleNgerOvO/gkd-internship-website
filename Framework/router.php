@@ -3,12 +3,22 @@
 namespace Framework;
 
 use App\Controllers\ErrorController;
+use Framework\Middleware\Authorise;
 
 class Router
 {
     protected $routes = [];
 
-    private function registerRoute($method, $uri, $action)
+    /**
+     * 注册一条路由规则
+     *
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @param array $middleware
+     * @return void
+     */
+    private function registerRoute($method, $uri, $action, $middleware = [])
     {
         list($controller, $controllerMethod) = explode('@', $action);
 
@@ -16,30 +26,69 @@ class Router
             'method' => $method,
             'uri' => $uri,
             'controller' => $controller,
-            'controllerMethod' => $controllerMethod
+            'controllerMethod' => $controllerMethod,
+            'middleware' => $middleware
         ];
     }
 
-    public function addGet($uri, $controller)
+    /**
+     * 添加一个 GET 路由
+     *
+     * @param string $uri
+     * @param string $controller
+     * @param array $middleware
+     * @return void
+     */
+    public function addGet($uri, $controller, $middleware = [])
     {
-        $this->registerRoute('GET', $uri, $controller);
+        $this->registerRoute('GET', $uri, $controller, $middleware);
     }
 
-    public function addPost($uri, $controller)
+    /**
+     * 添加一个 POST 路由
+     *
+     * @param string $uri
+     * @param string $controller
+     * @param array $middleware
+     * @return void
+     */
+    public function addPost($uri, $controller, $middleware = [])
     {
-        $this->registerRoute('POST', $uri, $controller);
+        $this->registerRoute('POST', $uri, $controller, $middleware);
     }
 
-    public function addPut($uri, $controller)
+    /**
+     * 添加一个 PUT 路由
+     *
+     * @param string $uri
+     * @param string $controller
+     * @param array $middleware
+     * @return void
+     */
+    public function addPut($uri, $controller, $middleware = [])
     {
-        $this->registerRoute('PUT', $uri, $controller);
+        $this->registerRoute('PUT', $uri, $controller, $middleware);
     }
 
-    public function addDelete($uri, $controller)
+    /**
+     * 添加一个 DELETE 路由
+     *
+     * @param string $uri
+     * @param string $controller
+     * @param array $middleware
+     * @return void
+     */
+    public function addDelete($uri, $controller, $middleware = [])
     {
-        $this->registerRoute('DELETE', $uri, $controller);
+        $this->registerRoute('DELETE', $uri, $controller, $middleware);
     }
 
+    /**
+     * 处理传入的请求 URI
+     *
+     * @param string $uri
+     * @return void
+     */
     public function route($uri)
     {
         $requestMethod = $_SERVER['REQUEST_METHOD'];
@@ -71,6 +120,9 @@ class Router
             }
 
             if ($match) {
+                foreach ($route['middleware'] as $middleware) {
+                    (new Authorise())->handle($middleware);
+                }
                 $controller = 'App\\Controllers\\' . $route['controller'];
                 $controllerMethod = $route['controllerMethod'];
 
@@ -79,7 +131,6 @@ class Router
                 return;
             }
         }
-
 
         ErrorController::notFound();
     }
