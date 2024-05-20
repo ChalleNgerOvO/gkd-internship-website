@@ -122,6 +122,12 @@ class ListingController
             ErrorController::notFound("职位不存在");
             return;
         }
+        //授权
+        if (!Authorisation::isOwner($listing->user_id)) {
+            Session::setFlashMessage('error_message', '您无权修改该职位');
+            return redirect('/listings/') . $listing->id;
+        }
+
         loadView('listings/edit', [
             'listing' => $listing
         ]);
@@ -137,6 +143,10 @@ class ListingController
         if (!$listing) {
             ErrorController::notFound("职位不存在");
             return;
+        }
+        if (!Authorisation::isOwner($listing->user_id)) {
+            Session::setFlashMessage('error_message', '您无权修改该职位');
+            return redirect('/listings/') . $listing->id;
         }
         $allowedFields = ['title', 'description', 'salary', 'tags', 'company', 'address', 'city', 'province', 'phone', 'email', 'requirements', 'benefits'];
         $updateValues = array_intersect_key($_POST, array_flip($allowedFields));
@@ -167,5 +177,41 @@ class ListingController
             Session::setFlashMessage('success_message', '更新职位成功');
             redirect('/listings/' . $id);
         }
+    }
+    /**
+     * 完成搜索功能
+     * 根据关键词和地点来搜索列表项
+     * 此方法从请求中获取关键词和地点，然后执行数据库查询以找到匹配的列表项。
+     * 查询结果用于渲染列表视图。
+     *
+     * @return void 无返回值。
+     */
+    public function search()
+    {
+        // 从 GET 请求中获取关键词和地点，如果没有提供则默认为空字符串
+        $keywords = isset($_GET['keywords']) ? trim($_GET['keywords']) : '';
+        $location = isset($_GET['location']) ? trim($_GET['location']) : '';
+
+        // 构建 SQL 查询，搜索标题、描述、标签或公司名中包含关键词，并且城市或州包含地点的列表
+        $query = "SELECT * FROM listing WHERE 
+        (title LIKE :keywords OR description LIKE :keywords OR 
+        tags LIKE :keywords OR company LIKE :keywords) AND 
+        (city LIKE :location OR province LIKE :location)";
+
+        // 准备查询参数，关键词和地点周围添加百分号以实现模糊匹配
+        $params = [
+            'keywords' => "%{$keywords}%",
+            'location' => "%{$location}%"
+        ];
+
+        // 执行查询并获取所有匹配的记录
+        $listings = $this->db->query($query, $params)->fetchAll();
+
+        // 加载列表视图，将筛选查询到的列表数据及搜索条件传递
+        loadView('listings/index', [
+            'listings' => $listings,
+            'keywords' => $keywords,
+            'location' => $location
+        ]);
     }
 }

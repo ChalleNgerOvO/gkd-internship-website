@@ -10,15 +10,17 @@
         <i class="fa fa-arrow-alt-circle-left"></i>
         返回列表
       </a>
-      <div class="flex space-x-4 ml-4">
-        <a href="/listings/edit/<?= $listing->id ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">编辑</a>
-        <!-- 删除表单 -->
-        <form method="POST">
-          <input type="hidden" name="_method" value="DELETE">
-          <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">删除</button>
-        </form>
-        <!-- 删除表单结束 -->
-      </div>
+      <?php if (Framework\Authorisation::isOwner($listing->user_id)) : ?>
+        <div class="flex space-x-4 ml-4">
+          <a href="/listings/edit/<?= $listing->id ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">编辑</a>
+          <!-- 删除表单 -->
+          <form method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">删除</button>
+          </form>
+          <!-- 删除表单结束 -->
+        </div>
+      <?php endif; ?>
     </div>
     <div class="p-4">
       <h2 class="text-xl font-semibold"><?= $listing->title ?></h2>
