@@ -156,4 +156,76 @@ class UserController
         // 重定向到网站首页
         redirect('/');
     }
+    /**
+     * 使用用户的电子邮件和密码验证用户身份
+     * 此方法首先进行输入验证，然后检查数据库中是否存在该电子邮件的用户，
+     * 并验证密码是否正确。如果验证成功，用户信息将被存储在会话中，并重定向到首页。
+     *
+     * @return void 无返回值
+     */
+    public function authenticate()
+    {
+        // 从 POST 数据中获取电子邮件和密码
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        // 初始化错误数组
+        $errors = [];
+
+        // 验证电子邮件格式
+        if (!Validation::email($email)) {
+            $errors['email'] = '请输入合法的邮箱地址！';
+        }
+
+        // 验证密码长度（至少6个字符，最多50个字符）
+        if (!Validation::string($password, 6, 50)) {
+            $errors['password'] = '密码为至少6位！';
+        }
+
+        // 如果存在验证错误，重新加载登录页面并显示错误信息
+        if (!empty($errors)) {
+            loadView('users/login', [
+                'errors' => $errors
+            ]);
+            exit;
+        }
+
+        // 准备查询参数，查找电子邮件
+        $params = [
+            'email' => $email
+        ];
+
+        // 从数据库查询用户
+        $user = $this->db->query('SELECT * FROM users WHERE email = :email', $params)->fetch();
+
+        // 如果未找到用户，说明电子邮件不正确
+        if (!$user) {
+            $errors['email'] = '用户不存在或密码错误！';
+            loadView('users/login', [
+                'errors' => $errors
+            ]);
+            exit;
+        }
+
+        // 验证密码是否正确
+        if (!password_verify($password, $user->password)) {
+            $errors['email'] = '用户不存在或密码错误！';
+            loadView('users/login', [
+                'errors' => $errors
+            ]);
+            exit;
+        }
+
+        // 验证通过，设置用户会话信息
+        Session::set('user', [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'city' => $user->city,
+            'province' => $user->province
+        ]);
+
+        // 登录成功后重定向到首页
+        redirect('/');
+    }
 }
