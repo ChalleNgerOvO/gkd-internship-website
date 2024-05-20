@@ -4,6 +4,9 @@ namespace App\Controllers;
 
 use Framework\Database;
 use Framework\Validation;
+use Framework\Session;
+use Framework\Authorisation;
+use Framework\Middleware\Authorise;
 
 class ListingController
 {
@@ -17,7 +20,7 @@ class ListingController
 
     public function index()
     {
-        $listings = $this->db->query('SELECT * FROM listing')->fetchAll();
+        $listings = $this->db->query('SELECT * FROM listing ORDER BY created_at DESC')->fetchAll();
 
         loadView('listings/index', [
             'listings' => $listings
@@ -54,7 +57,7 @@ class ListingController
 
         // 从表单获取允许的字段
         $newListingData = array_intersect_key($_POST, array_flip($allowedFields));
-        $newListingData['user_id'] = 1;
+        $newListingData['user_id'] = Session::get('user')['id'];
 
         // 清理数据
         $newListingData = array_map('sanitize', $newListingData);
@@ -96,6 +99,11 @@ class ListingController
             ErrorController::notFound("职位不存在!");
             return;
         }
+        if (!Authorisation::isOwner($listing->user_id)) {
+            inspect($_SESSION);
+            $_SESSION['error_message'] = '您无权删除该职位';
+            return redirect('/listings/') . $listing->id;
+        }
         $this->db->query('DELETE FROM listing WHERE id = :id', $params);
         $_SESSION['success_message'] = '删除职位成功';
         redirect('/listings');
@@ -135,7 +143,7 @@ class ListingController
         $errors = [];
         foreach ($requiredFields as $field) {
             if (empty($updateValues[$field]) || !Validation::string($updateValues[$field])) {
-                $errors[$field] = ucfirst($field) . ' 为必须项';
+                $errors[$field] = ucfirst($field) . ' 为必需项';
             }
         }
 
