@@ -7,6 +7,7 @@ use Framework\Validation;
 use Framework\Session;
 use Framework\Authorisation;
 use Framework\Middleware\Authorise;
+use Random\Engine\Secure;
 
 class ListingController
 {
@@ -84,6 +85,7 @@ class ListingController
             $values = ':' . implode(', :', array_keys($newListingData));
             $query = "INSERT INTO listing ({$fields}) VALUES ({$values})";
             $this->db->query($query, $newListingData);
+            Session::setFlashMessage('success_message', '添加职位成功');
             redirect('/listings');
         }
     }
@@ -101,11 +103,11 @@ class ListingController
         }
         if (!Authorisation::isOwner($listing->user_id)) {
             inspect($_SESSION);
-            $_SESSION['error_message'] = '您无权删除该职位';
+            Session::setFlashMessage('error_message', '您无权删除该职位');
             return redirect('/listings/') . $listing->id;
         }
         $this->db->query('DELETE FROM listing WHERE id = :id', $params);
-        $_SESSION['success_message'] = '删除职位成功';
+        Session::setFlashMessage('success_message', '删除职位成功');
         redirect('/listings');
     }
 
@@ -162,7 +164,7 @@ class ListingController
             $updateQuery = "UPDATE listing SET $updateFields WHERE id = :id";
             $updateValues['id'] = $id;
             $this->db->query($updateQuery, $updateValues);
-            $_SESSION['success_message'] = "职位信息已更新";
+            Session::setFlashMessage('success_message', '更新职位成功');
             redirect('/listings/' . $id);
         }
     }

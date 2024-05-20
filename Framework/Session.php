@@ -80,4 +80,34 @@ class Session
         session_unset(); // 清除所有会话变量
         session_destroy(); // 销毁会话
     }
+    /**
+     * 设置闪存消息
+     * 闪存消息用于在一个请求中设置消息，在下一个请求中显示后即被清除。
+     *
+     * @param string $key 消息的键，用于标识和检索消息。
+     * @param string $message 要存储的消息内容。
+     * @return void 无返回值。
+     */
+    public static function setFlashMessage($key, $message)
+    {
+        // 调用 set 方法将消息存储在会话中，键名前加上 'flash_' 前缀以区分。
+        self::set('flash_' . $key, $message);
+    }
+
+    /**
+     * 获取闪存消息并在获取后立即删除
+     * 这确保了消息只能被读取一次，用完即焚。
+     *
+     * @param string $key 消息的键，与设置消息时使用的键相同。
+     * @param mixed $default 如果消息不存在，返回的默认值。
+     * @return string 返回存储的消息，如果消息不存在，返回默认值。
+     */
+    public static function getFlashMessage($key, $default = null)
+    {
+        // 从会话中获取消息，如果不存在，则返回默认值。
+        $message = self::get('flash_' . $key, $default);
+        // 删除会话中的消息，确保它只被读取一次。
+        self::clear('flash_' . $key);
+        return $message;
+    }
 }
